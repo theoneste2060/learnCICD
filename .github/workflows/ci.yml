@@ -1,13 +1,48 @@
-name: learn-github-actions
-run-name: ${{ github.actor }} is learning GitHub Actions
-on: [push]
+name: Learn GitHub Actions
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types:
+      - opened
+
 jobs:
   check-bats-version:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v3
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
         with:
           node-version: '14'
-      - run: npm install -g bats
-      - run: bats -v
+
+      - name: Install Bats
+        run: npm install -g bats
+
+      - name: Run Bats Version
+        run: bats -v
+
+  publish-release:
+    runs-on: ubuntu-latest
+    needs: check-bats-version
+    steps:
+      - name: Create GitHub Release
+        id: create_release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            # Specify the files to include in the release
+            path/to/your/artifact/file.jar
+          token: ${{ secrets.TOKEN }}
+        
+      - name: Upload Release URL
+        run: echo "${{ steps.create_release.outputs.upload_url }}" > release_url.txt
+        
+      - name: Publish Release URL
+        uses: actions/upload-artifact@v2
+        with:
+          name: release-url
+          path: release_url.txt
