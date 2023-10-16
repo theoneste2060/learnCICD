@@ -38,7 +38,7 @@ jobs:
           files: |
             # Specify the files to include in the release
             path/to/your/artifact/file.jar
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.TOKEN }}
         
       - name: Upload Release URL
         run: echo "${{ steps.create_release.outputs.upload_url }}" > release_url.txt
